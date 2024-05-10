@@ -41,6 +41,10 @@ const tooltip = d3
 let data = [];
 let region;
 let circles;
+let xUnit;
+let yUnit;
+let legendRects;
+let legendTexts;
 
 d3.csv("data/gapminder_combined.csv").then((raw_data) => {
   data = raw_data.map((d) => {
@@ -95,4 +99,77 @@ d3.csv("data/gapminder_combined.csv").then((raw_data) => {
       tooltip.style("display", "none");
       d3.select(this).style("stroke-width", 1).attr("stroke", "#fff");
     });
+  // Units
+  xUnit = svg
+    .append("text")
+    .attr("transform", `translate(${width / 2}, ${height - 10})`)
+    .text("GDP per capita")
+    .attr("class", "unit");
+
+  yUnit = svg
+    .append("text")
+    .attr("transform", "translate(20," + height / 2 + ") rotate(-90)")
+    .text("Life expectancy")
+    .attr("class", "unit");
+
+  // Legend
+  legendRects = svg
+    .selectAll("legend-rects")
+    .data(region)
+    .enter()
+    .append("rect")
+    .attr("x", (d, i) => width - margin.right - 83)
+    .attr("y", (d, i) => height - margin.bottom - 70 - 25 * i)
+    .attr("width", 12)
+    .attr("height", 17)
+    .attr("fill", (d) => colorScale(d));
+
+  legendTexts = svg
+    .selectAll("legend-texts")
+    .data(region)
+    .enter()
+    .append("text")
+    .attr("x", (d, i) => width - margin.right - 83 + 20)
+    .attr("y", (d, i) => height - margin.bottom - 70 - 25 * i + 15)
+    .text((d) => d)
+    .attr("class", "legend-texts");
+});
+
+////////////////////////////  Resize  //////////////////////////////
+window.addEventListener("resize", () => {
+  //  width, height updated
+  width = parseInt(d3.select("#svg-container").style("width"));
+  height = parseInt(d3.select("#svg-container").style("height"));
+
+  //  scale updated
+  xScale.range([margin.left, width - margin.right]);
+  yScale.range([height - margin.bottom, margin.top]);
+
+  //  axis updated
+  d3.select(".x-axis")
+    .attr("transform", `translate(0,${height - margin.bottom})`)
+    .call(xAxis);
+
+  d3.select(".y-axis")
+    .attr("transform", `translate(${margin.left}, 0)`)
+    .call(yAxis);
+
+  // circles updated
+  circles
+    .attr("cx", (d) => xScale(d.income))
+    .attr("cy", (d) => yScale(d.life_expectancy))
+    .attr("r", (d) => radiusScale(d.population));
+
+  // units updated
+  xUnit.attr("transform", `translate(${width / 2}, ${height - 10})`);
+  yUnit.attr("transform", "translate(20," + height / 2 + ") rotate(-90)");
+
+  //  legend updated
+  legendRects
+    .attr("x", (d, i) => width - margin.right - 83)
+    .attr("y", (d, i) => height - margin.bottom - 70 - 25 * i);
+
+  legendTexts
+    .attr("x", (d, i) => width - margin.right - 83 + 20)
+    .attr("y", (d, i) => height - margin.bottom - 70 - 25 * i + 15);
 });
