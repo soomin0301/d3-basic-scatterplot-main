@@ -89,9 +89,13 @@ d3.csv("data/gapminder_combined.csv").then((raw_data) => {
     .on("mousemove", function (event, d, index) {
       tooltip
         .style("left", event.pageX + "px")
-        .style("top", event.pageY - 52 + "px")
+        .style("top", event.pageY - 120 + "px")
         .style("display", "block")
-        .html(`${d.country}`);
+        .style("background-color", "rgba(255, 255, 255, 0.9")
+        .style("border", "1px solid black")
+        .html(
+          `<div>${d.country} <span class = "test" style= "font-size:12px;"> <br/>Life expectancy: <br/><span style="font-size:20px;">${d.life_expectancy}`
+        );
 
       d3.select(this).style("stroke-width", 3).attr("stroke", "#111");
     })
