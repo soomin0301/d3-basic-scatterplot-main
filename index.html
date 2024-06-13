@@ -5,29 +5,23 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/src/main.css" />
-
-    <title>Scatter plot</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Final Project</title>
   </head>
+  <h1>국내 숙박여행 증감률 2020~2022</h1>
   <body>
-    <h1>Income <span>vs.</span> Life Expectancy</h1>
-
     <div class="button-container">
-      <button id="button-asia" class="buttons">Asia</button>
-      <button id="button-china" class="buttons">China</button>
-      <button id="button-us" class="buttons">United States</button>
-      <button id="button-europe" class="buttons">Europe</button>
-      <button id="button-africa" class="buttons">Africa</button>
+      <button id="button-2020" class="buttons">2020</button>
+      <button id="button-2021" class="buttons">2021</button>
+      <button id="button-2022" class="buttons">2022</button>
     </div>
-
-    <div id="text-desc"></div>
-
-    <div id="svg-container"></div>
+    <div id="text-desc" class="textdesc"></div>
+    <div id="svg-container"><div id="annotation"></div></div>
 
     <!-- Absolute path for Vite -->
-    <script type="module" src="/src/starter.js"></script>
-    <!-- <script type="module" src="/src/viz.js"></script> -->
-    <!-- <script type="module" src="/src/viz_interaction.js"></script> -->
-    <!-- <script type="module" src="/src/starter_storytelling.js"></script> -->
-    <!-- <script type="module" src="/src/viz_storytelling.js"></script> -->
+    <script type="module" src="/src/finalproject.js"></script>
   </body>
 </html>
