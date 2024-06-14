@@ -91,9 +91,6 @@ h1 span {
   justify-content: center;
   align-items: center;
 }
-/* .text-discription {
-
-} */
 
 .button-container button {
   /* position: absolute; */
@@ -114,10 +111,7 @@ h1 span {
   background-color: #111 !important;
   color: #fff;
 }
-.button-released {
-  background-color: rgba(0, 0, 0, 0);
-  color: #000;
-}
+
 /*text-desc*/
 
 .textdesc {
