@@ -40,13 +40,34 @@ d3.csv("data/tripdata.csv").then((raw_data) => {
 
   // scale
 
+  // 영어 -> 한국어
+  const regionMap = {
+    Seoul: "서울",
+    Busan: "부산",
+    Daegu: "대구",
+    Incheon: "인천",
+    Gwangju: "광주",
+    Daejeon: "대전",
+    Ulsan: "울산",
+    Sejong: "세종",
+    "Gyeong-gi": "경기",
+    Gangwon: "강원",
+    ChungBuk: "충북",
+    ChungNam: "충남",
+    JeonBuk: "전북",
+    JeonNam: "전남",
+    GyeongBuk: "경북",
+    GyeongNam: "경남",
+    Jeju: "제주",
+  };
+
   x = d3
     .scaleLinear()
     .range([margin.left, width - margin.right])
     .domain([-100, 100]);
   y = d3
     .scaleBand()
-    .domain(data.map((d) => d.region))
+    .domain(data.map((d) => regionMap[d.region]))
     .range([margin.top, height - margin.bottom])
     .padding(0.1);
   // .range([0, margin.top])
@@ -85,7 +106,7 @@ d3.csv("data/tripdata.csv").then((raw_data) => {
     .enter()
     .append("rect")
     .attr("x", (d) => (d.updown2020 > 0 ? x(0) : x(d.updown2020))) // 막대의 시작 위치
-    .attr("y", (d) => y(d.region)) // 막대의 세로 위치 (지역에 따라 스케일된 값)
+    .attr("y", (d) => y(regionMap[d.region])) // 막대의 세로 위치 (지역에 따라 스케일된 값)
 
     .attr("width", (d) =>
       d.updown2020 > 0 ? x(d.updown2020) - x(0) : x(0) - x(d.updown2020)
@@ -100,11 +121,11 @@ d3.csv("data/tripdata.csv").then((raw_data) => {
       let tooltipText;
 
       if (currentStep === 2020) {
-        tooltipText = `${d.region}: ${d.updown2020}%`;
+        tooltipText = `${regionMap[d.region]}: ${d.updown2020}%`;
       } else if (currentStep === 2021) {
-        tooltipText = `${d.region}: ${d.updown2021}%`;
+        tooltipText = `${regionMap[d.region]}: ${d.updown2021}%`;
       } else if (currentStep === 2022) {
-        tooltipText = `${d.region}: ${d.updown2022}%`;
+        tooltipText = `${regionMap[d.region]}: ${d.updown2022}%`;
       }
 
       tooltip
