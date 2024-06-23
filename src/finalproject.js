@@ -17,6 +17,7 @@ const margin = { top: 20, right: 50, bottom: 30, left: 100 };
 let button2020Selected = false;
 let button2021Selected = false;
 let button2022Selected = false;
+let button2019Selected = false;
 let xUnit;
 let yUnit;
 let data = [];
@@ -25,12 +26,14 @@ let x;
 let y;
 let xAxis;
 let yAxis;
-let currentStep = 2020;
+let currentStep = 2019;
+let regionMap;
 
 d3.csv("data/tripdata.csv").then((raw_data) => {
   data = raw_data.map((d) => {
     return {
       region: d.region,
+      updown2019: parseFloat(d.updown2019),
       updown2020: parseFloat(d.updown2020),
       updown2021: parseFloat(d.updown2021),
       updown2022: parseFloat(d.updown2022),
@@ -49,8 +52,8 @@ d3.csv("data/tripdata.csv").then((raw_data) => {
     Gwangju: "광주",
     Daejeon: "대전",
     Ulsan: "울산",
+    Gyeonggi: "경기",
     Sejong: "세종",
-    "Gyeong-gi": "경기",
     Gangwon: "강원",
     ChungBuk: "충북",
     ChungNam: "충남",
@@ -97,7 +100,7 @@ d3.csv("data/tripdata.csv").then((raw_data) => {
     .attr("class", "tooltip");
   // // svg elements
   d3.select("#text-desc").text(
-    "<2020년 기준> 전년도 대비 국내 숙박여행 증감률"
+    "<2019년 기준> 전년도 대비 국내 숙박여행 증감률"
   );
 
   bars = svg
@@ -105,22 +108,24 @@ d3.csv("data/tripdata.csv").then((raw_data) => {
     .data(data)
     .enter()
     .append("rect")
-    .attr("x", (d) => (d.updown2020 > 0 ? x(0) : x(d.updown2020))) // 막대의 시작 위치
+    .attr("x", (d) => (d.updown2019 > 0 ? x(0) : x(d.updown2019))) // 막대의 시작 위치
     .attr("y", (d) => y(regionMap[d.region])) // 막대의 세로 위치 (지역에 따라 스케일된 값)
 
     .attr("width", (d) =>
-      d.updown2020 > 0 ? x(d.updown2020) - x(0) : x(0) - x(d.updown2020)
+      d.updown2019 > 0 ? x(d.updown2019) - x(0) : x(0) - x(d.updown2019)
     )
 
     .attr("height", y.bandwidth())
     .attr("fill", (d) =>
-      d.updown2020 > 0 ? "rgba(0, 0, 139, 0.5)" : "rgba(139, 0, 0, 0.5)"
+      d.updown2019 > 0 ? "rgba(0, 0, 139, 0.5)" : "rgba(139, 0, 0, 0.5)"
     )
 
     .on("mouseover", function (event, d) {
       let tooltipText;
 
-      if (currentStep === 2020) {
+      if (currentStep === 2019) {
+        tooltipText = `${regionMap[d.region]}: ${d.updown2019}%`;
+      } else if (currentStep === 2020) {
         tooltipText = `${regionMap[d.region]}: ${d.updown2020}%`;
       } else if (currentStep === 2021) {
         tooltipText = `${regionMap[d.region]}: ${d.updown2021}%`;
@@ -129,8 +134,8 @@ d3.csv("data/tripdata.csv").then((raw_data) => {
       }
 
       tooltip
-        .style("left", event.pageX + 40 + "px")
-        .style("top", event.pageY - 100 + "px")
+        .style("left", event.pageX + "px")
+        .style("top", event.pageY - 50 + "px")
         .style("display", "block")
         .html(tooltipText);
 
@@ -143,7 +148,7 @@ d3.csv("data/tripdata.csv").then((raw_data) => {
       d3.select(this).style("stroke-width", 0).attr("stroke", "none");
     });
 
-  d3.select("#annotation").html("").style("left", "1000%");
+  d3.select("#annotation").html("").style("left", "200%");
 
   ////////////////////////////////////////////////////////////////////
   ////////////////////////////  Load CSV  ////////////////////////////
@@ -161,10 +166,50 @@ yUnit = svg
   .attr("transform", "translate(10,15)")
   .text("(행정구역 시)")
   .attr("class", "unit");
+//Button 2019
+d3.select("#button-2019").on("click", () => {
+  button2019Selected = !button2019Selected;
+  button2020Selected = false;
+  button2021Selected = false;
+  button2022Selected = false;
+
+  currentStep = 2019;
+
+  d3.select("#text-desc").text(
+    "<2019년 기준> 전년도 대비 국내 숙박여행 증감률"
+  );
+  d3.select("#button-2019").classed("button-clicked", button2019Selected);
+  d3.select("#button-2020").classed("button-clicked", false);
+  d3.select("#button-2021").classed("button-clicked", false);
+  d3.select("#button-2022").classed("button-clicked", false);
+
+  bars
+    .transition()
+    .duration(800)
+    .attr("x", (d) => (d.updown2019 > 0 ? x(0) : x(d.updown2019)))
+    .attr("width", (d) =>
+      d.updown2019 > 0 ? x(d.updown2019) - x(0) : x(0) - x(d.updown2019)
+    )
+    .attr("fill", (d) =>
+      d.updown2019 > 0 ? "rgba(0, 0, 139, 0.5)" : "rgba(139, 0, 0, 0.5)"
+    );
+  if (currentStep == 2019) {
+    d3.select("#annotation")
+      .html(
+        "<b>Covid19 이전:</b> 대부분 지역에서 증가 추세를 보이지만, 해외 여행이라는 대체 가능한 선택지로 인해 몇몇 지역에서 국내 숙박 여행 횟수가 감소하는 경향을 보임."
+      )
+      .style("left", "15%")
+      .style("top", "20%")
+      .style("width", "31%");
+  } else {
+    d3.select("#annotation").style("display", "none");
+  }
+});
 
 //Button 2020
 d3.select("#button-2020").on("click", () => {
   button2020Selected = !button2020Selected;
+  button2019Selected = false;
   button2021Selected = false;
   button2022Selected = false;
 
@@ -175,6 +220,7 @@ d3.select("#button-2020").on("click", () => {
   );
   d3.select("#button-2020").classed("button-clicked", button2020Selected);
   d3.select("#button-2021").classed("button-clicked", false);
+  d3.select("#button-2019").classed("button-clicked", false);
   d3.select("#button-2022").classed("button-clicked", false);
 
   bars
@@ -196,7 +242,7 @@ d3.select("#button-2020").on("click", () => {
   if (currentStep == 2020) {
     d3.select("#annotation")
       .html(
-        "<b>1. 대구·경북 지역:</b> 종교단체 집단감염 확산 <br><br> <b>2. 서울, 부산, 인천:</b> 인구 밀도 높은 대도시  <br><br> <b>전체적 양상:</b> 코로나로 인해 전국 관광 및 숙박여행 횟수 감소"
+        "<b>COVID19 유행 </b><br><br><b>1. 대구·경북 지역:</b> 종교단체 집단감염 확산 <br><br> <b>2. 서울, 부산, 인천:</b> 인구 밀도 높은 대도시  <br><br> <b>전체적 양상:</b> 코로나로 인해 전국 관광 및 숙박여행 횟수 감소"
       )
       .style("left", "60%")
       .style("top", "10%");
@@ -208,6 +254,7 @@ d3.select("#button-2020").on("click", () => {
 //Button 2021
 d3.select("#button-2021").on("click", () => {
   button2021Selected = !button2021Selected;
+  button2019Selected = false;
   button2020Selected = false;
   button2022Selected = false;
 
@@ -217,6 +264,7 @@ d3.select("#button-2021").on("click", () => {
     "<2021년 기준> 전년도 대비 국내 숙박여행 증감률"
   );
   d3.select("#button-2021").classed("button-clicked", button2021Selected);
+  d3.select("#button-2019").classed("button-clicked", false);
   d3.select("#button-2020").classed("button-clicked", false);
   d3.select("#button-2022").classed("button-clicked", false);
 
@@ -253,6 +301,7 @@ d3.select("#button-2021").on("click", () => {
 //Button 2022
 d3.select("#button-2022").on("click", () => {
   button2022Selected = !button2022Selected;
+  button2019Selected = false;
   button2020Selected = false;
   button2021Selected = false;
 
@@ -262,6 +311,7 @@ d3.select("#button-2022").on("click", () => {
     "<2022년 기준> 전년도 대비 국내 숙박여행 증감률"
   );
   d3.select("#button-2022").classed("button-clicked", button2022Selected);
+  d3.select("#button-2019").classed("button-clicked", false);
   d3.select("#button-2021").classed("button-clicked", false);
   d3.select("#button-2020").classed("button-clicked", false);
 
@@ -312,11 +362,18 @@ window.addEventListener("resize", () => {
     .attr("transform", `translate(${margin.left}, 0)`)
     .call(yAxis);
 
+  // 2019bars updated
+  if (currentStep == 2019)
+    bars
+      .attr("x", (d) => (d.updown2019 > 0 ? x(0) : x(d.updown2019)))
+      .attr("width", (d) =>
+        d.updown2019 > 0 ? x(d.updown2019) - x(0) : x(0) - x(d.updown2019)
+      );
+
   // 2020bars updated
   if (currentStep == 2020)
     bars
       .attr("x", (d) => (d.updown2020 > 0 ? x(0) : x(d.updown2020)))
-      .attr("y", (d) => y(d.region))
       .attr("width", (d) =>
         d.updown2020 > 0 ? x(d.updown2020) - x(0) : x(0) - x(d.updown2020)
       );
@@ -324,7 +381,6 @@ window.addEventListener("resize", () => {
   if (currentStep == 2021)
     bars
       .attr("x", (d) => (d.updown2021 > 0 ? x(0) : x(d.updown2021)))
-      .attr("y", (d) => y(d.region))
       .attr("width", (d) =>
         d.updown2021 > 0 ? x(d.updown2021) - x(0) : x(0) - x(d.updown2021)
       );
@@ -332,7 +388,7 @@ window.addEventListener("resize", () => {
   if (currentStep == 2022)
     bars
       .attr("x", (d) => (d.updown2022 > 0 ? x(0) : x(d.updown2022)))
-      .attr("y", (d) => y(d.region))
+
       .attr("width", (d) =>
         d.updown2022 > 0 ? x(d.updown2022) - x(0) : x(0) - x(d.updown2022)
       );
